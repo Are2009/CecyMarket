@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - CECyMarket</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .contenedor {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #218838;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .password-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .password-container input {
+            border: none;
+            outline: none;
+        }
+
+        .password-container button {
+            border: none;
+            background: white;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .entrar {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            background: #218838;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .entrar:hover {
+            background: #19692c;
+        }
+
+        .enlace {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #218838;
+            text-decoration: none;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h1>CECyMarket</h1>
+        <p>Bienvenido de nuevo</p>
+
+        <form action="{{ url_for('login') }}" method="POST">
+
+            <label>Nombre de usuario</label>
+
+            <input
+                type="text"
+                name="usuario"
+                autocomplete="username"
+                required
+            >
+
+            <label>Contraseña</label>
+
+            <div class="password-container">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    onclick="mostrarPassword()"
+                    id="botonOjo"
+                    aria-label="Mostrar contraseña"
+                >👁️</button>
+
+            </div>
+
+            <button type="submit" class="entrar">
+                Iniciar sesión
+            </button>
+
+        </form>
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <a href="{{ url_for('registro') }}" class="enlace">
+            ¿No tienes cuenta? Regístrate
+        </a>
+
+    </div>
+
+    <script>
+        function mostrarPassword() {
+
+            const campo = document.getElementById("password");
+            const boton = document.getElementById("botonOjo");
+
+            if (campo.type === "password") {
+
+                campo.type = "text";
+                boton.textContent = "🙈";
+
+            } else {
+
+                campo.type = "password";
+                boton.textContent = "👁️";
+
+            }
+        }
+    </script>
+
+</body>
+</html>

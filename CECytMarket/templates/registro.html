@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - CECyMarket</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .contenedor {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #218838;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .password-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .password-container input {
+            border: none;
+            outline: none;
+        }
+
+        .password-container button {
+            border: none;
+            background: white;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .registrar {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            background: #218838;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .registrar:hover {
+            background: #19692c;
+        }
+
+        .enlace {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #218838;
+            text-decoration: none;
+        }
+
+        .mensaje {
+            text-align: center;
+            margin-top: 12px;
+            color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h1>CECyMarket</h1>
+        <p>Crear una cuenta</p>
+
+        <form action="{{ url_for('registro') }}" method="POST">
+
+            <label>Nombre de usuario</label>
+            <input
+                type="text"
+                name="usuario"
+                maxlength="50"
+                required
+            >
+
+            <label>Contraseña</label>
+            <div class="password-container">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    minlength="8"
+                    required
+                >
+                <button
+                    type="button"
+                    onclick="mostrarPassword('password', this)"
+                    aria-label="Mostrar contraseña"
+                >👁️</button>
+            </div>
+
+            <label>Confirmar contraseña</label>
+            <div class="password-container">
+                <input
+                    type="password"
+                    id="confirmar"
+                    name="confirmar"
+                    minlength="8"
+                    required
+                >
+                <button
+                    type="button"
+                    onclick="mostrarPassword('confirmar', this)"
+                    aria-label="Mostrar contraseña"
+                >👁️</button>
+            </div>
+
+            <button type="submit" class="registrar">
+                Registrarme
+            </button>
+
+        </form>
+
+        <a href="{{ url_for('login') }}" class="enlace">
+            ¿Ya tienes cuenta? Inicia sesión
+        </a>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for categoria, mensaje in mensajes %}
+                    <div class="mensaje">{{ mensaje }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    </div>
+
+    <script>
+        function mostrarPassword(id, boton) {
+            const campo = document.getElementById(id);
+
+            if (campo.type === "password") {
+                campo.type = "text";
+                boton.textContent = "🙈";
+            } else {
+                campo.type = "password";
+                boton.textContent = "👁️";
+            }
+        }
+    </script>
+
+</body>
+</html>

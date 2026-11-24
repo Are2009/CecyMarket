@@ -1,0 +1,39 @@
+
+{% extends "base.html" %}
+{% block title %}Bienvenida{% endblock %}
+{% block content %}
+
+<section class="inicio-cecyt">
+
+    <h1>Bienvenida y bienvenido</h1>
+
+    <div class="logo-principal">
+        <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="Logo CECyTE Guanajuato">
+    </div>
+
+    <h2>CECyMarket</h2>
+
+    <p class="descripcion-inicio">
+        Un espacio para compartir, ayudar y apoyar a nuestra comunidad
+        estudiantil mediante la donación de ropa y materiales escolares.
+    </p>
+
+    <div class="beneficios">
+        <div class="beneficio"><h3>SOLIDARIO</h3></div>
+        <div class="beneficio"><h3>SEGURO</h3></div>
+        <div class="beneficio"><h3>EDUCATIVO</h3></div>
+        <div class="beneficio"><h3>PARA TODOS</h3></div>
+    </div>
+
+    <a href="{{ url_for('login') }}" class="boton-inicio">
+        INICIAR SESIÓN
+    </a>
+
+    <p class="frase-inicio">
+        "Pequeñas acciones pueden generar grandes cambios".
+    </p>
+
+</section>
+
+{% endblock %}
+

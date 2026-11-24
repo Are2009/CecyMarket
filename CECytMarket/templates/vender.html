@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Vender{% endblock %}
+{% block content %}
+
+<section class="formulario-donacion">
+
+    <h2>Publicar un artículo para vender</h2>
+    <p>Ofrece ropa y materiales escolares a nuestra comunidad.</p>
+
+    <form method="POST">
+
+        <label>Nombre del artículo</label>
+        <input type="text" name="prenda" placeholder="Ej. Mochila escolar" required>
+
+        <label>Talla o descripción</label>
+        <input type="text" name="talla" placeholder="Ej. Mediana o color azul">
+
+        <label>Estado</label>
+        <select name="estado" required>
+            <option value="Nuevo">Nuevo</option>
+            <option value="Usado">Usado</option>
+        </select>
+
+        <label>Precio en pesos</label>
+        <input type="number" name="precio" min="0.01" step="0.01" required>
+
+        <button type="submit">Publicar artículo</button>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Productos disponibles{% endblock %}
+{% block content %}
+
+<section class="contenedor-listado">
+    <h1>Mercadito CECyMarket</h1>
+    <p>Encuentra artículos gratuitos y productos en venta.</p>
+
+    <div class="acciones-listado">
+        <a href="{{ url_for('donar') }}" class="btn">Realizar una donación</a>
+        <a href="{{ url_for('vender') }}" class="btn boton-vender">Publicar producto en venta</a>
+    </div>
+
+    <h2>Notificaciones</h2>
+    {% for notificacion in notificaciones %}
+        <p>{{ notificacion['mensaje'] }} <small>({{ notificacion['fecha'] }})</small></p>
+    {% else %}
+        <p>No tienes notificaciones.</p>
+    {% endfor %}
+
+    <h2>Donaciones gratuitas</h2>
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr>
+                    <th>Artículo</th><th>Talla</th><th>Estado</th>
+                    <th>Publicado por</th><th>Disponibilidad</th>
+                    <th>Precio</th><th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in donaciones %}
+                <tr>
+                    <td>{{ d['prenda'] }}</td>
+                    <td>{{ d['talla'] or 'No aplica' }}</td>
+                    <td>{{ d['estado'] }}</td>
+                    <td>{{ d['nombre_dueno'] or 'Publicación anterior' }}</td>
+                    <td>
+                        {% if d['reservado_por'] %}
+                            Apartado<br>
+                            <small>Apartado por: {{ d['nombre_reservador'] or 'Usuario' }}</small>
+                            {% if d['punto_encuentro'] %}
+                                <br><small>Punto: {{ d['punto_encuentro'] }}</small>
+                            {% endif %}
+                        {% else %}
+                            Disponible
+                        {% endif %}
+                    </td>
+                    <td>$0.00</td>
+                    <td class="acciones-tabla">
+                        {% if d['usuario_id'] == usuario_actual %}
+                            <a class="boton-accion" href="{{ url_for('editar', id=d['id']) }}">Editar</a>
+
+                            <form action="{{ url_for('eliminar', id=d['id']) }}" method="POST">
+                                <button class="boton-accion" type="submit">Eliminar</button>
+                            </form>
+
+                            {% if d['reservado_por'] %}
+                                <form action="{{ url_for('cancelar_apartado', tipo='donacion', id=d['id']) }}" method="POST">
+                                    <button class="boton-accion" type="submit">Cancelar apartado</button>
+                                </form>
+                            {% endif %}
+
+                        {% elif d['reservado_por'] %}
+                            {% if d['reservado_por'] == usuario_actual %}
+                                <form action="{{ url_for('cancelar_apartado', tipo='donacion', id=d['id']) }}" method="POST">
+                                    <button class="boton-accion" type="submit">Cancelar mi apartado</button>
+                                </form>
+                            {% else %}
+                                No disponible
+                            {% endif %}
+
+                        {% elif d['usuario_id'] %}
+                            <form action="{{ url_for('apartar', tipo='donacion', id=d['id']) }}" method="POST">
+                                <label for="punto-donacion-{{ d['id'] }}">Punto de encuentro:</label>
+                                <input id="punto-donacion-{{ d['id'] }}" type="text" name="punto"
+                                       placeholder="Ej. entrada principal" maxlength="150" required>
+                                <button class="boton-accion" type="submit">Apartar</button>
+                            </form>
+                        {% else %}
+                            Sin propietario
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No hay donaciones disponibles.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Productos en venta</h2>
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr>
+                    <th>Artículo</th><th>Talla</th><th>Estado</th>
+                    <th>Publicado por</th><th>Disponibilidad</th>
+                    <th>Precio</th><th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in ventas %}
+                <tr>
+                    <td>{{ v['prenda'] }}</td>
+                    <td>{{ v['talla'] or 'No aplica' }}</td>
+                    <td>{{ v['estado'] }}</td>
+                    <td>{{ v['nombre_dueno'] or 'Publicación anterior' }}</td>
+                    <td>
+                        {% if v['reservado_por'] %}
+                            Apartado<br>
+                            <small>Apartado por: {{ v['nombre_reservador'] or 'Usuario' }}</small>
+                            {% if v['punto_encuentro'] %}
+                                <br><small>Punto: {{ v['punto_encuentro'] }}</small>
+                            {% endif %}
+                        {% else %}
+                            Disponible
+                        {% endif %}
+                    </td>
+                    <td>${{ "%.2f"|format(v['precio']) }}</td>
+                    <td class="acciones-tabla">
+                        {% if v['usuario_id'] == usuario_actual %}
+                             <form action="{{ url_for('editar_venta', id=v['id']) }}" method="POST">
+                                <button class="boton-accion" type="submit">Editar</button>
+                            </form>
+
+                            <form action="{{ url_for('eliminar_venta', id=v['id']) }}" method="POST">
+                                <button class="boton-accion" type="submit">Eliminar</button>
+                            </form>
+
+                            {% if v['reservado_por'] %}
+                                <form action="{{ url_for('cancelar_apartado', tipo='venta', id=v['id']) }}" method="POST">
+                                    <button class="boton-accion" type="submit">Cancelar apartado</button>
+                                </form>
+                            {% endif %}
+
+                        {% elif v['reservado_por'] %}
+                            {% if v['reservado_por'] == usuario_actual %}
+                                <form action="{{ url_for('cancelar_apartado', tipo='venta', id=v['id']) }}" method="POST">
+                                    <button class="boton-accion" type="submit">Cancelar mi apartado</button>
+                                </form>
+                            {% else %}
+                                No disponible
+                            {% endif %}
+
+                        {% elif v['usuario_id'] %}
+                            <form action="{{ url_for('apartar', tipo='venta', id=v['id']) }}" method="POST">
+                                <label for="punto-venta-{{ v['id'] }}">Punto de encuentro:</label>
+                                <input id="punto-venta-{{ v['id'] }}" type="text" name="punto"
+                                       placeholder="Ej. entrada principal" maxlength="150" required>
+                                <button class="boton-accion" type="submit">Apartar producto</button>
+                            </form>
+                        {% else %}
+                            Sin propietario
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No hay productos en venta.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  #game-container {
+    text-align: center;
+    background: #f8f9ff;
+    border-radius: 20px;
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', sans-serif;
+  }
+  #stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  #gameArea {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    background: linear-gradient(#87CEEB, #E0F6FF);
+    border: 4px solid #222;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: none;
+  }
+  #canasta {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    width: 90px;
+    height: 50px;
+    background: #ff8c00;
+    border-radius: 0 0 20px 20px;
+    border: 3px solid #000;
+    transform: translateX(-50%);
+    font-size: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .objeto {
+    position: absolute;
+    font-size: 32px;
+    user-select: none;
+    transition: transform 0.1s;
+  }
+  #startScreen, #endScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 15px;
+  }
+  #endScreen { display: none; }
+  button.jugar {
+    background: #6a5acd;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  button.jugar:hover { background: #5846c4; transform: scale(1.05); }
+</style>
+
+<div id="game-container">
+  <h2>🛒 CECyTMarket Rush</h2>
+  <p>¡Atrapa la ropa buena para donar! Evita la basura.</p>
+  <div id="stats">
+    <div>⭐ Puntos: <span id="puntos">0</span></div>
+    <div>❤️ Vidas: <span id="vidas">3</span></div>
+    <div>🔥 Nivel: <span id="nivel">1</span></div>
+  </div>
+
+  <div id="gameArea">
+    <div id="startScreen">
+      <h1 style="font-size:50px;">👕</h1>
+      <h3>¿Listo para donar?</h3>
+      <p>Mueve la canasta con el MOUSE o tu DEDO</p>
+      <p>👕👖👗 = +10 pts &nbsp; | &nbsp; 🗑️🦠 = -1 vida</p>
+      <button class="jugar" onclick="iniciarJuego()">¡JUGAR AHORA!</button>
+    </div>
+    
+    <div id="endScreen">
+      <h1 id="endTitle">¡Fin!</h1>
+      <h2 id="endScore"></h2>
+      <p id="endMsg"></p>
+      <button class="jugar" onclick="iniciarJuego()">🔄 Jugar otra vez</button>
+      <a href="{{ url_for('donar') }}" style="margin-top:10px; text-decoration:none; color:#6a5acd; font-weight:bold;">Ir a Donar ropa real →</a>
+    </div>
+
+    <div id="canasta">🧺</div>
+  </div>
+</div>
+
+<script>
+let puntos = 0, vidas = 3, nivel = 1, jugando = false, intervalo;
+const gameArea = document.getElementById('gameArea');
+const canasta = document.getElementById('canasta');
+const ropaBuena = ['👕','👖','👗','🧥','👚','🧢'];
+const ropaMala = ['🗑️','🦠','💩','🚬'];
+
+gameArea.addEventListener('mousemove', (e) => {
+  if (!jugando) return;
+  let rect = gameArea.getBoundingClientRect();
+  let x = e.clientX - rect.left - 45;
+  if (x < 0) x = 0;
+  if (x > rect.width - 90) x = rect.width - 90;
+  canasta.style.left = x + 'px';
+  canasta.style.transform = 'none';
+});
+
+gameArea.addEventListener('touchmove', (e) => {
+  if (!jugando) return;
+  let rect = gameArea.getBoundingClientRect();
+  let x = e.touches[0].clientX - rect.left - 45;
+  if (x < 0) x = 0;
+  if (x > rect.width - 90) x = rect.width - 90;
+  canasta.style.left = x + 'px';
+  canasta.style.transform = 'none';
+  e.preventDefault();
+}, {passive: false});
+
+function iniciarJuego() {
+  puntos = 0; vidas = 3; nivel = 1;
+  document.getElementById('puntos').innerText = 0;
+  document.getElementById('vidas').innerText = 3;
+  document.getElementById('nivel').innerText = 1;
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('endScreen').style.display = 'none';
+  document.querySelectorAll('.objeto').forEach(el => el.remove());
+  jugando = true;
+  clearInterval(intervalo);
+  intervalo = setInterval(crearObjeto, 600);
+}
+
+function crearObjeto() {
+  if (!jugando) return;
+  let el = document.createElement('div');
+  el.className = 'objeto';
+  let esBuena = Math.random() > 0.3;
+  el.innerText = esBuena ? ropaBuena[Math.floor(Math.random()*ropaBuena.length)] : ropaMala[Math.floor(Math.random()*ropaMala.length)];
+  el.dataset.buena = esBuena;
+  el.style.left = Math.random() * (gameArea.offsetWidth - 40) + 'px';
+  el.style.top = '-40px';
+  gameArea.appendChild(el);
+
+  let caida = setInterval(() => {
+    if (!jugando) { clearInterval(caida); el.remove(); return; }
+    let top = parseInt(el.style.top) + (3 + nivel);
+    el.style.top = top + 'px';
+
+    let cRect = canasta.getBoundingClientRect();
+    let oRect = el.getBoundingClientRect();
+    let gRect = gameArea.getBoundingClientRect();
+
+    if (oRect.bottom >= cRect.top && oRect.top <= cRect.bottom && oRect.left >= cRect.left - 10 && oRect.right <= cRect.right + 10) {
+      if (el.dataset.buena == 'true') {
+        puntos += 10;
+        el.style.transform = 'scale(1.5)';
+        setTimeout(()=>el.remove(), 100);
+      } else {
+        vidas--;
+        document.getElementById('vidas').innerText = vidas;
+        el.innerText = '💥';
+        setTimeout(()=>el.remove(), 200);
+        if (vidas <= 0) terminarJuego();
+      }
+      document.getElementById('puntos').innerText = puntos;
+      if (puntos % 50 == 0 && puntos > 0) {
+        nivel++;
+        document.getElementById('nivel').innerText = nivel;
+        clearInterval(intervalo);
+        intervalo = setInterval(crearObjeto, Math.max(200, 600 - nivel*50));
+      }
+      clearInterval(caida);
+    }
+
+    if (top > gameArea.offsetHeight) {
+      if (el.dataset.buena == 'true') {
+        vidas--;
+        document.getElementById('vidas').innerText = vidas;
+        if (vidas <= 0) terminarJuego();
+      }
+      el.remove();
+      clearInterval(caida);
+    }
+  }, 16);
+}
+
+function terminarJuego() {
+  jugando = false;
+  clearInterval(intervalo);
+  document.getElementById('endScreen').style.display = 'flex';
+  document.getElementById('endScore').innerText = `Lograste ${puntos} puntos`;
+  let msg = puntos < 30 ? "¡Sigue practicando! Cada prenda cuenta." : puntos < 100 ? "¡Bien! Ya eres donador junior." : "¡ERES LEYENDA DE CECyTMarket! 👑";
+  document.getElementById('endMsg').innerText = msg;
+}
+</script>
+{% endblock %}

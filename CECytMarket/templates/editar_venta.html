@@ -1,0 +1,35 @@
+
+{% extends "base.html" %}
+{% block title %}Editar producto en venta{% endblock %}
+{% block content %}
+
+<section class="formulario-donacion">
+
+    <h2>Modificar producto en venta</h2>
+    <p>Actualiza la información de tu artículo.</p>
+
+    <form method="POST">
+
+        <label>Nombre del artículo</label>
+        <input type="text" name="prenda" value="{{ venta['prenda'] }}" required>
+
+        <label>Talla o descripción</label>
+        <input type="text" name="talla" value="{{ venta['talla'] or '' }}">
+
+        <label>Estado</label>
+        <select name="estado" required>
+            <option value="Nuevo" {% if venta['estado'] == 'Nuevo' %}selected{% endif %}>Nuevo</option>
+            <option value="Usado" {% if venta['estado'] == 'Usado' %}selected{% endif %}>Usado</option>
+        </select>
+
+        <label>Precio en pesos</label>
+        <input type="number" name="precio" min="0.01" step="0.01" value="{{ venta['precio'] }}" required>
+
+        <button type="submit">Guardar cambios</button>
+        <a href="{{ url_for('listado') }}" class="btn">Cancelar</a>
+
+    </form>
+
+</section>
+
+{% endblock %}

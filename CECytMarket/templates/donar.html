@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Donar{% endblock %}
+{% block content %}
+
+<section class="formulario-donacion">
+
+    <h2>Realizar una donación</h2>
+    <p>Comparte algo que ya no necesites y ayuda a otro estudiante.</p>
+
+    <form method="POST">
+
+        <label>Tipo de prenda o material</label>
+        <input type="text" name="prenda" placeholder="Ej. Camisa o mochila" required>
+
+        <label>Talla</label>
+        <input type="text" name="talla" placeholder="Ej. Mediana o no aplica">
+
+        <label>Estado</label>
+        <select name="estado" required>
+            <option value="">Selecciona una opción</option>
+            <option value="Nuevo">Nuevo</option>
+            <option value="Usado">Usado</option>
+        </select>
+
+        <button type="submit">Publicar donación</button>
+
+    </form>
+
+</section>
+
+{% endblock %}

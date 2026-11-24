@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones | CECyMarket</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<main class="container">
+
+    <h1>Notificaciones 🔔</h1>
+
+    <a href="{{ url_for('listado') }}" class="btn">
+        Regresar
+    </a>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in mensajes %}
+            <p class="mensaje">{{ mensaje }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    {% for s in solicitudes %}
+
+    <section class="solicitud">
+
+        {% if s.vendedor_id == usuario_actual %}
+            <h2>Solicitud recibida</h2>
+            <p>
+                <strong>{{ s.nombre_comprador }}</strong>
+                quiere apartar tu producto.
+            </p>
+        {% else %}
+            <h2>Mi solicitud</h2>
+            <p>Vendedor: {{ s.nombre_vendedor }}</p>
+        {% endif %}
+
+        <h3>{{ s.nombre_producto }}</h3>
+
+        <p>
+            Estado:
+            <strong>{{ s.estado }}</strong>
+        </p>
+
+        {% if s.vendedor_id == usuario_actual
+              and s.estado == 'Pendiente' %}
+
+            <div class="acciones-solicitud">
+
+                <form method="POST"
+                action="{{ url_for('responder_solicitud',
+                id=s.id, accion='aceptar') }}">
+
+                    <button type="submit">
+                        Aceptar
+                    </button>
+                </form>
+
+                <form method="POST"
+                action="{{ url_for('responder_solicitud',
+                id=s.id, accion='rechazar') }}">
+
+                    <button type="submit" class="btn-rechazar">
+                        Rechazar
+                    </button>
+                </form>
+
+            </div>
+
+        {% endif %}
+
+        {% if s.estado == 'Aceptada' %}
+
+            <hr>
+
+            <h3>Acuerdo de entrega</h3>
+
+            <p>
+                📍 Punto de encuentro:
+                <strong>{{ s.punto_encuentro }}</strong>
+            </p>
+
+            {% if s.vendedor_id == usuario_actual %}
+
+                {% if s.fecha_hora %}
+
+                    <p>
+                        Fecha y hora propuestas:
+                        <strong>{{ s.fecha_hora | replace('T', ' ') }}</strong>
+                    </p>
+
+                    {% if s.hora_confirmada %}
+
+                        <p class="confirmado">
+                            ✓ Horario confirmado
+                        </p>
+
+                    {% else %}
+
+                        <form method="POST"
+                        action="{{ url_for('confirmar_horario',
+                        id=s.id) }}">
+
+                            <button type="submit">
+                                Confirmar horario
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <p>Esperando propuesta de horario del comprador.</p>
+
+                {% endif %}
+
+            {% else %}
+
+                <form method="POST"
+                action="{{ url_for('proponer_horario', id=s.id) }}">
+
+                    <label>Selecciona fecha y hora de entrega:</label>
+
+                    <input
+                        type="datetime-local"
+                        name="fecha_hora"
+                        required
+                    >
+
+                    <button type="submit">
+                        Enviar propuesta
+                    </button>
+
+                </form>
+
+                {% if s.fecha_hora %}
+
+                    <p>
+                        Horario propuesto:
+                        {{ s.fecha_hora | replace('T', ' ') }}
+                    </p>
+
+                    {% if s.hora_confirmada %}
+                        <p class="confirmado">
+                            ✓ El vendedor confirmó el horario
+                        </p>
+                    {% else %}
+                        <p>Esperando confirmación del vendedor.</p>
+                    {% endif %}
+
+                {% endif %}
+
+            {% endif %}
+
+        {% endif %}
+
+        {% if s.estado == 'Rechazada' %}
+            <p class="rechazado">El vendedor rechazó la solicitud.</p>
+        {% endif %}
+
+        {% if s.estado == 'Cancelada' %}
+            <p>Esta solicitud fue cancelada.</p>
+        {% endif %}
+
+    </section>
+
+    {% else %}
+
+        <p class="sin-notificaciones">
+            No tienes notificaciones todavía.
+        </p>
+
+    {% endfor %}
+
+</main>
+
+</body>
+</html>
